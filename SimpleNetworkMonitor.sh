@@ -59,9 +59,9 @@ base_dir="${BASH_SOURCE%/*}"
 error_log=$base_dir/error.log
 std_log=$base_dir/std.log
 url="http://www.google.com"
-down_flag=false
 int_ip="1.1.1.1"
 get_pub_ip
+down_flag=false
 
 if [ "$1" == "debug" ];
 then
