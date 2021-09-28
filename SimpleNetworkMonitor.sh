@@ -34,6 +34,25 @@ function get_date () {
 
 }
 
+function get_pub_ip () {
+
+	pub_ip=$(curl -s https://ipinfo.io | grep -e '\"ip\"' | awk '{print $2}' | sed 's/\"//g' | sed 's/\,//')
+	# echo $pub_ip
+	
+}
+
+function cmd_ping () {
+
+	local ip=$1
+
+	dt=$(get_date)
+	echo $dt " ping -c 5 $ip" >> $error_log
+
+	ping -c 5 $ip >> $error_log
+
+}
+
+
 ################################################################################
 base_dir="${BASH_SOURCE%/*}"
 
@@ -41,6 +60,8 @@ error_log=$base_dir/error.log
 std_log=$base_dir/std.log
 url="http://www.google.com"
 down_flag=false
+int_ip="1.1.1.1"
+get_pub_ip
 
 if [ "$1" == "debug" ];
 then
@@ -67,6 +88,9 @@ log_std "     sleep_time: $sleep_time"
 log_std "sleep_time_down: $sleep_time_down"
 log_std "    pass_notify: $pass_notify"
 
+
+echo "pub_ip: $pub_ip"
+
 while true; do
 
 	wget -q --tries=5 --timeout=5 -O - $url > /dev/null
@@ -77,6 +101,16 @@ while true; do
 		log_error "ERROR: Unable to connect to $url"
 		((down_count+=1))
 		down_flag=true
+
+		log_error "========================================================"
+		log_error "Ping public IP: $pub_ip"
+		cmd_ping $pub_ip
+
+		log_error "========================================================"
+		log_error "Ping Cloudflare DNS: $int_ip"	
+		cmd_ping $int_ip
+
+		log_error "========================================================"
 
 		if [ $down_count -eq 3 ];
 		then
