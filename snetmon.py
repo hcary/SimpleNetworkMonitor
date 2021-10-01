@@ -75,7 +75,8 @@ def check_ping(host):
     global error_count
     global ok_count
     global gen_error
-
+                 
+    stdout.info('TESTING: Sending ping request to: ' + str(host))
     r = subprocess.run(['ping', '-c3', '-W1', host], capture_output=True, text=True)
 
     if gen_error:
@@ -83,11 +84,13 @@ def check_ping(host):
 
     if r.returncode != 0:
         # stdout.error(r.returncode)
-        stdout.error('Ping returned error code: ' + str(r.returncode))
+        stdout.error(' FAILED: Ping returned error code: ' + str(r.returncode))
 
         ping_output=r.stdout.split('\n')
         for line in ping_output:
-            stdout.critical(line)
+            stdout.critical('  ' + line)
+    else:
+        stdout.info(' PASSED: Host ' + host + ' responded...')
 
     return r.returncode
 
@@ -150,8 +153,11 @@ if __name__ == '__main__':
 
     setup_logger('stdout', stdout_log)
     stdout = logging.getLogger('stdout')
-    
 
+    # function calling
+    print_head('SimpleNetworkMonitor Starting')    
+
+    stdout.info(' ----------------------- SETTINGS -----------------------')
     stdout.info('        ok_count: ' + str(ok_count))
     stdout.info('   ok_int_report: ' + str(ok_int_report))
     stdout.info('     error_count: ' + str(error_count))
@@ -161,7 +167,9 @@ if __name__ == '__main__':
     stdout.info('      stdout_log: ' + stdout_log)
     stdout.info('        ping_ips: ' + ping_ips)
 
-    # function calling
-    print_head('SimpleNetworkMonitor Starting')
+    stdout.info(' ----------------- TESTING CONNECTIVTY ------------------')
+    hosts = ping_ips.split(",")
+    for host in hosts:
+        check_ping(host)
 
     main()
