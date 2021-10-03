@@ -10,7 +10,7 @@ import logging
 import configparser
 
 from urllib.error import HTTPError
-from optparse import OptionParser
+
 
 def print_tl(msg):
     print(" ", msg)
@@ -61,8 +61,7 @@ def check_url(url):
 
     except requests.ConnectionError as e:
         msg = 'Connection Error: ' + str(e) + ' Unable to connect to ' + url
-        stdout.critical(msg)
-        ok_status = True
+        stdout.critical(msg)        ok_status = True
 
     if ok_status and ok_count % ok_int_report == 0:
         seconds = ok_count * sleep_time
